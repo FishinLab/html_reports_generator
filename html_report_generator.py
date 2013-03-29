@@ -17,7 +17,7 @@ type_info = "Info"
 
 class xml_parser(object):
 
-    def __init__(self, reports_path = ".\\", report_names = []):
+    def __init__(self, reports_path = os.getcwd(), report_names = []):
         self.reports_path = reports_path
         self.report_names = report_names
         self.total = {}
@@ -33,13 +33,13 @@ class xml_parser(object):
             xml_report = ET.parse(file_path)
             xml_root = xml_report.getroot()
             shutdown_msgs = xml_root.findall(self.msg_path)
-            model_name = (file_path.split("\\")[1]).split(".")[0]
+            model_name = (file_path.split(os.sep)[1]).split(".")[0]
             
             for msg in shutdown_msgs:
                 if( type_verification == msg.attrib["Type"]):
                     to = int(msg.attrib["Message"].split(" ")[0]) 
                     if model_name in self.total:
-  		self.total[model_name] += to
+  			self.total[model_name] += to
 			self.results[model_name] = 0
                     else:
                         self.total[model_name] = to
@@ -84,12 +84,12 @@ class xml_parser(object):
         xsl_style = libxml2.parseFile(xsl_path)
         xsl = libxslt.parseStylesheetDoc(xml_style)
         week_report = xsl.applyStyleSheet(xml)
-        xsl.saveResultToFilename(".\\", week_report, 0)
+        xsl.saveResultToFilename(os.getcwd(), week_report, 0)
 		
 if __name__ == "__main__":
-    default_xmls_path = ".\\"
-    xsl_sheet_path = ".\\report.xsl"
-    template_path = ".\\report\\report_temp.xml"
+    default_xmls_path = os.getcwd()
+    xsl_sheet_path = os.getcwd() + "report.xsl"
+    template_path = os.getcwd() + "report" + os.sep + "report_temp.xml"
 
     report_names = []
     for f in os.listdir(default_xmls_path):
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     
     for f in report_names:
 		parser.parse_xml(default_xmls_path + f)
-    parser.generate_xml(default_xmls_path + "report\\report.xml", template_path)
+    parser.generate_xml(default_xmls_path + "report" + os.sep + "report.xml", template_path)
     
 #FIXME: Because of parser.transmit method depends on libxml2 and libxslt,
 #       but these tools are not installed,
